@@ -6,7 +6,13 @@ const state = require('./state-manager');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+// Allow cross-origin connections (useful when frontend is hosted separately)
+const io = new Server(server, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST']
+  }
+});
 
 const CLIENT_DIR = path.join(__dirname, '..', 'client');
 app.use(express.static(CLIENT_DIR));
@@ -22,7 +28,7 @@ io.on('connection', (socket) => {
   io.emit('user_list', Array.from(users.values()));
 
   socket.on('drawing_step', (data) => {
-    // stamp stroke with user info for consistent rendering
+    
     const stroke = Object.assign({}, data, { userId: socket.id, userColor: users.get(socket.id)?.color });
     const saved = state.addStroke(stroke);
     io.emit('stroke_added', saved);
