@@ -1,4 +1,7 @@
-const socket = io();
+// Allow an external server URL to be set (useful when hosting client separately,
+// e.g. frontend on Netlify and backend on Railway/Render). If `window.SERVER_URL`
+// is present, connect there; otherwise connect to same origin.
+const socket = (window.SERVER_URL && window.SERVER_URL.length) ? io(window.SERVER_URL) : io();
 const listeners = {};
 
 socket.on('connect', () => {
